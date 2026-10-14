@@ -16,6 +16,10 @@ import (
 // Configuration
 // ============================
 
+// ============================
+// Configuration
+// ============================
+
 type Config struct {
 	DBHost     string
 	DBPort     string
@@ -129,6 +133,46 @@ func connectDB(cfg Config) (*sql.DB, error) {
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(5)
 	return db, nil
+}
+
+// ============================
+// Static File Handler
+// ============================
+
+func staticHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// API routes tetap ke handler masing-masing
+		if r.URL.Path == "/health" {
+			healthCheckHandler(w, r)
+			return
+		}
+		if r.URL.Path == "/api/pods" {
+			getPodsHandler(w, r)
+			return
+		}
+		if r.URL.Path == "/api/pods/details" {
+			getPodDetailsHandler(w, r)
+			return
+		}
+		if r.URL.Path == "/api/pods/access" {
+			getAccessLogsHandler(w, r)
+			return
+		}
+		if r.URL.Path == "/api/metrics" {
+			getMetricsHandler(w, r)
+			return
+		}
+		if r.URL.Path == "/api/threats" {
+			getThreatsHandler(w, r)
+			return
+		}
+		if r.URL.Path == "/api/warnings" {
+			getWarningsHandler(w, r)
+			return
+		}
+		// SPA fallback - semuanya ke index.html kecuali API
+		http.FileServer(http.Dir("frontend_dist")).ServeHTTP(w, r)
+	})
 }
 
 // ============================
@@ -384,27 +428,10 @@ func main() {
 // Route Setup
 // ============================
 
-func setupRoutes() *http.ServeMux {
-	mux := http.NewServeMux()
-	
-	// Health check
-	mux.HandleFunc("GET /health", healthCheckHandler)
-	
-	// Pod endpoints
-	mux.HandleFunc("GET /api/pods", getPodsHandler)
-	mux.HandleFunc("GET /api/pods/details", getPodDetailsHandler)
-	
-	// Access logs
-	mux.HandleFunc("GET /api/pods/access", getAccessLogsHandler)
-	
-	// Metrics
-	mux.HandleFunc("GET /api/metrics", getMetricsHandler)
-	
-	// Threats
-	mux.HandleFunc("GET /api/threats", getThreatsHandler)
-	
-	// Warnings
-	mux.HandleFunc("GET /api/warnings", getWarningsHandler)
-	
-	return mux
+// ============================
+// Route Setup
+// ============================
+
+func setupRoutes() http.Handler {
+	return staticHandler()
 }
