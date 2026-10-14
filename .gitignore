@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+coverage/
+
+# Build outputs
+dist/
+build/
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.dump
+*.sql
+
+# Go
+*.exe
+*.test
+*.a
+*.out
+
+# Vite
+.dev.vite
+
+# Docker
+*.dockerignore
+docker-compose.override.yml
